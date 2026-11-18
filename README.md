@@ -14,3 +14,7 @@ git clone https://github.com/yustme/evidence-driven-development.git "$HOME/.code
 Invoke it explicitly in Codex, for example:
 
 > Use $evidence-driven-development to scope and implement an orders CSV export. Verify that staff can download the right rows through the normal workflow.
+
+## License
+
+[MIT](LICENSE)
