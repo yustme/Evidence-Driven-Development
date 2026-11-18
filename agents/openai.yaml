@@ -1,0 +1,4 @@
+interface:
+  display_name: "Evidence-Driven Development"
+  short_description: "Build and verify software from user outcomes"
+  default_prompt: "Use $evidence-driven-development to implement this software task and verify the result through its normal entry point."

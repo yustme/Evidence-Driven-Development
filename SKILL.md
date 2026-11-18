@@ -1,0 +1,16 @@
+---
+name: evidence-driven-development
+description: Use when asked to scope or implement a software feature, reproduce and fix a bug, integrate an API, or verify a release. Clarify the user's workflow and the smallest usable first pass, then test the running result, authorization boundaries, and regressions in proportion to risk.
+---
+
+# Evidence-Driven Development
+
+When applying this skill to a software task, briefly tell the user in their language which practices apply. Keep the announcement to one sentence.
+
+1. **Define the outcome.** Read the existing context first. For new software or a feature with unresolved decisions, ask a short, adaptive round of questions about the user, their end-to-end task, and the smallest usable result. Continue independent work and settle decisions that materially affect the first pass. For a clear bug fix, a reproduction and an expected result may suffice. See [first usable pass](references/verification-and-maintenance.md#first-usable-pass).
+2. **Investigate and coordinate.** Check relevant code, tests, and primary sources for uncertain dependencies. Use authorized parallel agents for substantial independent questions. Give each independent Git writer a separate branch and worktree, with clear ownership. Look for recurring shared-file conflicts and have a coordinator verify the integrated result. See [research](references/verification-and-maintenance.md#research-and-integration-evidence) and [parallel implementation](references/verification-and-maintenance.md#parallel-implementation).
+3. **Implement the real workflow.** Reuse domain logic and build the smallest complete result. Use test doubles for tests where useful. Production work requires real behavior and explicit required settings. Enforce validation, target boundaries, and transactional behavior consistently across supported entry points. Preserve Undo where it belongs to the workflow.
+4. **Verify through the normal entry point.** Reproduce the failure where feasible. Check observable and persisted state on the actual application or integration. Use targeted checks during edits and risk-based checks on the integrated result. For permission or sensitive data changes, verify a real negative boundary case. For a release, tie required checks to the source and artifact being released and verify recovery where the change warrants it. See [access boundaries](references/verification-and-maintenance.md#access-and-data-boundaries), [regression](references/verification-and-maintenance.md#regression-coverage-and-replay), and [release checks](references/verification-and-maintenance.md#release-and-recovery).
+5. **Report what the evidence supports.** Identify what ran, what passed, and material gaps. Separate a working implementation, an agent walkthrough, feedback from representative users, and real-world results. State assumptions that affect the outcome.
+
+Read only the applicable sections above. For [usability](references/verification-and-maintenance.md#usability), [handoffs and diagnostics](references/verification-and-maintenance.md#provenance-and-feedback), or [changes to skill routing](references/verification-and-maintenance.md#skill-discovery-and-selection), use the corresponding section. Keep a localized fix focused on the failing path and relevant checks.

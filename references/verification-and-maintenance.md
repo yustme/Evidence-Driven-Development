@@ -1,0 +1,57 @@
+# Verification and Maintenance
+
+## First usable pass
+
+Read the request, prior decisions, and relevant product surfaces or code before asking. For new software or a feature that leaves important decisions open, establish who will use it and what they already know, which job they need to complete end to end, and what observable outcome counts as success. Set scope and non-goals. Resolve constraints, integrations, data, and risks that affect that outcome. Use acceptance evidence to choose the smallest usable slice that completes the job. Confirm only decisions that remain open and materially change the result.
+
+Ask only the highest-priority unresolved questions in short rounds. Group questions that are answerable together. Defer questions whose answers depend on an open decision. Use evidence to challenge conflicting requirements and offer a concrete recommendation when it helps the user decide. Look up facts you can verify yourself. Keep independent investigation or implementation moving within authorized scope. Make reversible assumptions explicit and resolve material, required decisions before relying on them. Stop asking once the first useful pass has a clear outcome and acceptance check. A clear bug fix with known behavior does not need a discovery session.
+
+## Research and integration evidence
+
+Determine the versions actually in use, then record the primary source, its applicability, and what a runnable probe confirms. Distinguish documented behavior from an inference. For an SDK call, check one real success path and the failure cases that could change correctness, such as declined authorization, expired sessions, unsupported capabilities, timeout, or cancellation. Verify the outcome at the receiving boundary, such as usable access in the running app, a persisted state change, or delivery to the intended device. Use an authorized environment and scoped data. If a prerequisite blocks real verification, report it directly.
+
+## Parallel implementation
+
+- Inspect the repository status and choose the authorized base revision before dispatch. Start each independent writer on a separate Git worktree and branch from that base. Follow the repository's branch naming rules. Give each writer explicit file or task ownership. Resolve overlapping ownership before work starts. Assign a shared file to one writer where practical, or agree on the edits and coordinator responsible for reconciling them. Read-only or research agents may share a checkout.
+- Preserve staged, unstaged, and untracked work. A worktree from a committed revision does not include those changes. If the task depends on unfinished work, coordinate an explicit handoff of the required changes with their owner. Avoid copying unrelated edits or moving them into a branch implicitly. Avoid resetting, stashing, cleaning, or deleting work unless needed and authorized.
+- Isolate the runtime too when relevant. Give concurrent runs distinct sockets, ports, output or build-cache directories, and disposable test data or document copies. A separate checkout alone does not isolate a shared running application or its state. Serialize runs whose runtime state cannot be separated safely.
+- In a non-Git repository or a checkout the user explicitly wants to share, disclose the missing isolation and serialize overlapping writes and operations on a shared Git index. Keep ownership explicit even if independent work can proceed in parallel.
+- Use a clean integration checkout when the original checkout contains unrelated work. Within the authorized Git scope, the coordinator reviews each branch diff, merges or cherry-picks the intended changes onto the integration branch, and resolves conflicts deliberately with both changes in view. Run the relevant integration and regression tests on the combined result. Passing tests in individual branches establish only those branch results.
+
+Use change and conflict history, ownership, and actual dependency paths to identify files that repeatedly slow integration. Worktrees isolate writes but do not eliminate logical merge conflicts. Give shared hotspots a coordinated owner or serialize integration there. Where the evidence and task scope support refactoring, move cohesive behavior behind small, stable interfaces, keep entry points thin, and avoid needless central registration for every feature. File length alone does not justify splitting code or introducing services.
+
+## Access and data boundaries
+
+When changes touch authentication, permissions, sensitive data, or write-capable tools, exercise the real authorization and persistence path in an authorized test environment with scoped accounts and disposable records. Verify one permitted outcome and a meaningful denial, such as a different owner’s record, a lower-privileged role, or an out-of-scope write target. Check that the denied attempt leaves no unauthorized state change, response data, or downstream side effect. Trace where sensitive data is read, filtered, stored, returned, and sent to tools, third parties, or logs. Verify the affected boundary with recognizable test data. If that check is blocked, report which boundary remains unverified.
+
+## Regression coverage and replay
+
+For changes spanning a product or release, inventory existing entry points, workflows, and shared state. Prioritize affected paths, changed contracts, data created by earlier versions, and core flows whose failure would be costly. Check UI interactions and data behavior such as selection, persistence, export, Undo/Redo, and targeting only the intended record, where relevant. Use a concrete replay fixture that a reviewer can run without editing live data. Preserve or provide one check command when it makes recurring verification easier.
+
+Assert outcomes at useful boundaries. Unit tests can verify a calculation or command. An integration test can verify an API contract or persisted result. An end-to-end check follows the real entry point through to the user-visible outcome. A fixture, mock, calculation, or screenshot alone cannot establish production integration or real-world behavior. Include a deliberate bad input or failed dependency when it establishes that a check can catch a real failure. Prefer assertions against independently expected results or invariants over tests that copy the implementation. Note any skipped checks and why.
+
+Measure where time is spent before optimizing tests. Separate build, setup, and execution time, and compare cold and warm runs where caching matters. Identify slow, flaky, and redundant cases. Run targeted checks during edits, then run risk-appropriate integration and broader regression checks before merge or release. Avoid rerunning a costly full suite for a cosmetic edit without a reason. Parallelize or shard only isolated cases. Cache results or artifacts with keys that cover relevant source, dependency, toolchain, and configuration inputs. When selecting impacted tests, account for shared dependencies and broaden the run when the impact is uncertain. When changes to test selection or risk make missed dependencies plausible, compare the selected suite with a full run on the same revision and source state. Use any unexpected gaps to adjust selection. Required checks still apply. Keep meaningful coverage and report actual failures or omissions.
+
+## Release and recovery
+
+Tie required checks to the source state and artifact actually being released. Record the revision, material dirty state or source digest, and build or artifact identifier. If a relevant input changed after checks ran, rerun the affected checks against the release candidate. Keep release readiness unverified while a required check lacks evidence for that candidate. When deployment is authorized, smoke-test the critical workflow through the deployed entry point and define what observed failure triggers a stop or recovery.
+
+For schema or saved-document migrations, verify compatibility with representative old data and any old clients or readers that remain supported during rollout. Check that newly written data behaves as intended. Decide which failures permit rollback and which require a tested forward repair or restore because code rollback cannot undo a data change. Keep deployment within the user's authorization. When deployment is out of scope, verify what you can in an authorized environment and report what remains.
+
+## Usability
+
+Use the perspective of the intended user and walk through their normal tasks in the actual UI. Can they find the starting point, fill in required fields, recover from an error, and recognize success without coaching? At a pause for input, show the question, needed context, and a direct way to answer. Reduce repeated entry and put settings where they belong, such as the application, account, or document.
+
+Expose the meaning of a plan or result in the UI. Prefer previews, visual explanations, short tooltips near decisions, and progressive disclosure where they help. When setup can appear valid without actually working, consider a scoped in-place verification action that reports what passed or failed. Check accessibility in proportion to impact, such as labels, keyboard flow, focus, and assistive technology behavior for the affected audience. For a new or substantially changed workflow with material usability uncertainty, observe a representative user completing the core task without coaching before claiming usability was validated. An agent inspection can expose friction and verify interactions. If a representative person is unavailable, report the inspection and keep usability validation open.
+
+## Provenance and feedback
+
+- When validating a build, record the revision or source snapshot, material uncommitted changes, build identifier, fixture, and verification command. Preserve the user's Git boundaries and keep parallel writes coordinated. For handoffs, include the exact source state, what passed, and what remains.
+- Log the minimum metadata needed to diagnose or replay an issue, such as operation, scoped request or build ID, validation outcome, and timing. Prefer omission and redact secrets and unnecessary personal data before writing or sharing diagnostics. Avoid blanket request or response payload capture. Link to relevant redacted logs or summaries.
+- Address repeated failures at their source. Improve schemas, action descriptions, validation, error messages, or target selection when the evidence points there. Prefer resolving ambiguity in the product over accumulating prompt workarounds.
+- Keep agent guidance short. Let an existing `AGENTS.md` point to the relevant code paths and targeted check commands. Put durable facts in one maintained place and link to it. Load additional context only when needed.
+- Capture confirmed, reusable domain lessons separately when authorized. Keep customer or project details out of general skills. If a product has an assistant, consider supplying relevant domain guidance to it within its existing capability and validation boundaries.
+
+## Skill discovery and selection
+
+When creating or changing a skill's routing, check that the installed runtime lists it and that its references resolve. Exercise selection with an explicit invocation, a suitable task that omits the skill name, and an unrelated task. Inspect which instructions the runtime actually used and what the agent did. Record observed results separately from discovery and avoid inferring that every future prompt will route the same way.
